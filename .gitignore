@@ -1,0 +1,18 @@
+# Ambiente (segredos/config local) — versionamos só o exemplo
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Datasets gerados (recriados no build/seed via generate_datasets.py)
+.kiro/mcp-servers/plena-datasets/data/*.csv
+
+# Config local do Kiro (cada participante copia de mcp.example.json)
+.kiro/settings/mcp.json
+
+# SO
+.DS_Store

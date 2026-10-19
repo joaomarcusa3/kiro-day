@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Checar formato da entrega",
+      "trigger": "PostTaskExec",
+      "description": "Valida a entrega contra os guardrails da Plena após cada tarefa.",
+      "action": {
+        "type": "agent",
+        "prompt": "A tarefa terminou. Verifique os guardrails da Plena: todo número é rastreável a uma query SQL/script (CS-01)? A rentabilidade foi ranqueada por margem e não por faturamento (CS-02/RN-01)? Rendimento/perda estão em % além do kg (CS-03)? O período é abr–set/2025 (CS-05)? Se a tarefa fechar a análise, a entrega está no formato 3 achados + 1 recomendação (CS-06)? Aponte qualquer violação."
+      }
+    }
+  ]
+}

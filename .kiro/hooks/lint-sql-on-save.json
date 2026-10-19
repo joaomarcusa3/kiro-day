@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Formatar SQL ao salvar",
+      "trigger": "PostFileSave",
+      "description": "Lembrete de como executar SQL no ambiente Docker ao salvar um .sql.",
+      "matcher": "\\.sql$",
+      "action": {
+        "type": "command",
+        "command": "echo \"Arquivo SQL salvo. Rode as queries dentro do Docker: docker compose run --rm analise psql \\\"$DATABASE_URL\\\" -f <arquivo>\""
+      }
+    }
+  ]
+}

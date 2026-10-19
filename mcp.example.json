@@ -1,0 +1,48 @@
+{
+  "mcpServers": {
+    "plena-business-rules": {
+      "command": "docker",
+      "args": [
+        "compose",
+        "-f", "${workspaceFolder}/docker-compose.yml",
+        "run", "--rm", "--no-deps", "-T",
+        "mcp-business-rules"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "list_business_rule_documents",
+        "get_business_rule_document",
+        "list_business_rules",
+        "search_business_rules",
+        "get_acceptance_criteria"
+      ]
+    },
+    "plena-architecture": {
+      "command": "docker",
+      "args": [
+        "compose",
+        "-f", "${workspaceFolder}/docker-compose.yml",
+        "run", "--rm", "--no-deps", "-T",
+        "mcp-architecture"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "get_landscape",
+        "list_systems",
+        "get_system",
+        "list_tech_stack",
+        "get_database",
+        "list_interfaces",
+        "get_interface",
+        "get_environments",
+        "list_coding_standards",
+        "list_design_constraints",
+        "get_design_guardrails",
+        "validate_object_name",
+        "list_architecture_decisions",
+        "get_analysis_stack",
+        "get_deploy_config"
+      ]
+    }
+  }
+}

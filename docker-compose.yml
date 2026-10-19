@@ -1,0 +1,73 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: plena-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-plena}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-plena}
+      POSTGRES_DB: ${POSTGRES_DB:-plena}
+    ports:
+      # Host ${POSTGRES_HOST_PORT} -> container 5432 (evita conflito com outros Postgres).
+      # Dentro da rede do compose os serviços ainda usam postgres:5432.
+      - "${POSTGRES_HOST_PORT:-5544}:5432"
+    volumes:
+      - plena-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-plena} -d ${POSTGRES_DB:-plena}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Carrega os dois CSVs da Plena no Postgres e encerra (job de seed).
+  seed:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: plena-workshop:latest
+    container_name: plena-seed
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://plena:plena@postgres:5432/plena}
+    command: ["python", "mcp-servers/plena-datasets/load_to_postgres.py"]
+
+  # Análise sob demanda: roda SQL contra o Postgres via runner Python (sem psql).
+  # Uso: docker compose run --rm analise "SELECT canal, sum(receita_rs) FROM plena_comercial_faturamento GROUP BY 1"
+  #      docker compose run --rm analise -f analises/minha_consulta.sql
+  #      docker compose run --rm --entrypoint bash analise     (shell interativo)
+  analise:
+    image: plena-workshop:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://plena:plena@postgres:5432/plena}
+    volumes:
+      - ./analises:/app/analises
+    working_dir: /app
+    entrypoint: ["python", "mcp-servers/plena-datasets/query.py"]
+    stdin_open: true
+    tty: true
+
+  # MCP server: regras de negócio (stdio). Lançado pelo Kiro via `docker compose run`.
+  mcp-business-rules:
+    image: plena-workshop:latest
+    environment:
+      FASTMCP_LOG_LEVEL: ${FASTMCP_LOG_LEVEL:-ERROR}
+    command: ["python", "mcp-servers/business-rules/server.py"]
+    stdin_open: true
+    tty: false
+
+  # MCP server: arquitetura / landscape (stdio).
+  mcp-architecture:
+    image: plena-workshop:latest
+    environment:
+      FASTMCP_LOG_LEVEL: ${FASTMCP_LOG_LEVEL:-ERROR}
+    command: ["python", "mcp-servers/architecture/server.py"]
+    stdin_open: true
+    tty: false
+
+volumes:
+  plena-pgdata:

@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Consultar regras antes da tarefa",
+      "trigger": "PreTaskExec",
+      "description": "Lembra o agente de consultar business-rules e architecture antes de cada tarefa de spec.",
+      "action": {
+        "type": "agent",
+        "prompt": "Antes de executar esta tarefa, consulte os MCPs da Plena: use `plena-business-rules` (search_business_rules / get_acceptance_criteria) para confirmar O QUÊ o negócio pede, e `plena-architecture` (list_design_constraints / get_design_guardrails) para confirmar o que PODE e NÃO PODE ser feito. Garanta rastreabilidade do requisito ao que será implementado."
+      }
+    }
+  ]
+}
